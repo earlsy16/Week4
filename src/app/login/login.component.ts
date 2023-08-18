@@ -1,38 +1,59 @@
-import { Component } from '@angular/core';
-import {Router} from '@angular/router';
+import { Component,OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { LoginService } from '../services/login.service';
+import {User} from "../user";
+import {Router} from "@angular/router";
+import { FormsModule } from '@angular/forms';
+
+
 
 @Component({
   selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule,FormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent{
+export class LoginComponent implements OnInit {
+constructor(private router: Router, private loginService: LoginService) {}
+ 
+  errormsg = "";
+  newuser:User = new User();
+  username:string = "";
+  password:string = "";
+  loggedin:boolean = false;
 
-  // Declare class properties
-  email: string = "";
-  password: string = "";
-
-  // Create users array for login check
-  users = [
-    {"email": "abc@com.au", "password": "abc"},
-    {"email": "bcd@com.au", "password": "bcd"},
-    {"email": "cde@com.au", "password": "cde"},
-  ]
-
-  constructor(private router: Router){}
-
-
-  // Login function for login attempts
-  login() {
-    // Check if email and password BOTH match any user in the users array
-    const user = this.users.find(u => u.email === this.email && u.password === this.password);
-
-    if (user) {
-      // Redirect to account page if login is successful
-      this.router.navigate(['/account']);
-    } else {
-      // Show error message if invalid
-      alert('Invalid email or password');
+  ngOnInit() {
+    if (sessionStorage.getItem('currentUser')){
+      this.loggedin = true;
+    }else{
+      this.loggedin = false;
+    
     }
   }
+
+  signin(event:any){
+    console.log("at signin");
+    event.preventDefault();
+    this.loginService.login(this.username,this.password).subscribe({
+      next:
+        (data)=>{
+          if (data.valid == true){
+            this.newuser = new User(data.username,data.email)
+            this.loginService.setCurrentuser(this.newuser);
+            this.router.navigate(['/profile']);
+          }else{
+           
+            this.errormsg = "There is a problem with the credentials";
+          }
+      
+      error:
+        this.errormsg = "There is a problem with the credentials";
+      
+    }
+      
+   
+  })
+
+}
 }
