@@ -1,36 +1,29 @@
-module.exports = function (app) {
-    // Route to manage user login
-    app.post('/api/auth', function (req, res) {
-        let users = [
-            { "username": 'andrew', "birthdate": '1997-13-05', "age": 26, "email": 'andrew@.com', "password": 'andrew' },
-            { "username": 'jim', "birthdate": '2000-01-01', "age": 23, "email": 'jim@.com', "password": 'jim' },
-            { "username": 'fred', "birthdate": '2000-02-02', "age": 22, "email": 'fred@.com', "password": 'fred' }];
+const express = require('express'); //Import express module
+const router = express.Router(); //Calling top-level express function
+const path = require('path');
+const fs = require('fs');
 
-        if (!req.body) {
-            return res.sendStatus(400)
+// Define the users array
+const users = [
+    { "username": 'andrew', "birthdate": '1997-13-05', "age": 26, "email": 'andrew@.com', "upwd": 'andrew' },
+    { "username": 'jim', "birthdate": '2000-01-01', "age": 23, "email": 'jim@.com', "upwd": 'jim' },
+    { "username": 'fred', "birthdate": '2000-02-02', "age": 22, "email": 'fred@.com', "upwd": 'fred' }
+];
+
+router.post('/', function (req, res) {
+
+    var user = {};
+    user.username = req.body.username;
+    user.valid = false;
+
+    for (let i = 0; i < users.length; i++) {
+        console.log(users);
+        if (user.username == users[i].username) {
+            user = { 'username': users[i].username, 'email': users[i].email, 'birthdate': users[i].birthdate, 'age': users[i].age, 'valid': true };
+            console.log(user);
         }
+    }
+    res.send(user);
+});
 
-        var user = {};
-
-        user.valid = false;
-        user.email = '';
-        user.username = '';
-
-        for (let i = 0; i < users.length; i++) {
-            if (req.body.username == users[i].username && req.body.upwd == users[i].pwd) {
-                userString = JSON.stringify({
-                    valid: true,
-                    username: users[i].username,
-                    birthdate: users[i].birthdate,
-                    age: users[i].age,
-                    email: users[i].email,
-                });
-                // Store user details in session storage
-                req.session.user = userString;
-            }
-        }
-
-        res.send(user);
-    });
-
-}
+module.exports = router

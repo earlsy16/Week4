@@ -16,6 +16,9 @@ export class ProfileComponent {
       const userString = sessionStorage.getItem('user');
       if (userString) {
         this.user = JSON.parse(userString);
+        // Convert user age to number from string for use in form
+        this.user.age = +this.user.age;
+        console.log(this.user);
       } else {
         // Redirect to login if user data is not available
         this.router.navigate(['/login']);
@@ -25,5 +28,7 @@ export class ProfileComponent {
     // Function to update user data and save to session storage
     updateProfile() {
       sessionStorage.setItem('user', JSON.stringify(this.user));
+      // Refresh page to update HTML and form placeholders
+      window.location.reload();
     }
   }

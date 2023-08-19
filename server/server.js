@@ -13,6 +13,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../dist/my-app/')));
 
 // User authentication route
-require('./routes/auth.js')(app,path);
+const authRoute = require('./routes/auth.js');
+app.use('/api/auth', authRoute);
+
 // Start server listening on port 3000. Output message to console
 require('./listen.js')(http,PORT);
